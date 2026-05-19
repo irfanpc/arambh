@@ -1,0 +1,534 @@
+/* =========================================
+   ADMIN PANEL STYLES
+   ========================================= */
+
+body {
+    background-color: #f8fafc;
+    margin: 0;
+}
+
+/* Authentication Screen */
+.admin-auth-container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, var(--bg-light) 0%, var(--primary-light) 100%);
+}
+
+.auth-card {
+    background: var(--white);
+    padding: 40px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.auth-logo {
+    height: 80px;
+    margin-bottom: 20px;
+}
+
+.auth-header h2 {
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.auth-header p {
+    color: var(--text-muted);
+    margin-bottom: 30px;
+    font-size: 0.9rem;
+}
+
+.form-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s;
+}
+
+.form-group input:focus, .form-group select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.2);
+}
+
+.error-msg {
+    color: #e53e3e;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    display: none;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+/* Dashboard Layout */
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    background: var(--white);
+    box-shadow: 5px 0 15px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+}
+
+.sidebar-header {
+    padding: 30px 20px;
+    text-align: center;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.sidebar-logo {
+    height: 60px;
+}
+
+.nav-menu {
+    list-style: none;
+    padding: 20px 0;
+    margin: 0;
+}
+
+.nav-menu li a {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 25px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.nav-menu li.active a, .nav-menu li a:hover {
+    color: var(--primary-color);
+    background: var(--bg-light);
+    border-right: 4px solid var(--primary-color);
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.topbar {
+    background: var(--white);
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+}
+
+.admin-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.gallery-manager {
+    padding: 40px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.manager-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+/* Upload Zone */
+.upload-zone {
+    background: var(--white);
+    border: 3px dashed #cbd5e1;
+    border-radius: 20px;
+    padding: 50px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-bottom: 40px;
+}
+
+.upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--primary-color);
+    background: var(--bg-light);
+}
+
+.upload-content i {
+    font-size: 3rem;
+    color: var(--primary-light);
+    margin-bottom: 15px;
+}
+
+.upload-content h3 {
+    color: var(--text-dark);
+}
+
+.upload-content p {
+    color: var(--text-muted);
+}
+
+/* Editable Grid */
+.editable-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+.edit-card {
+    background: var(--white);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    position: relative;
+    cursor: grab;
+    transition: 0.3s;
+}
+
+.edit-card:active {
+    cursor: grabbing;
+    transform: scale(1.02);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.edit-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+}
+
+.edit-card-info {
+    padding: 15px;
+}
+
+.edit-card-info h4 {
+    margin: 0 0 5px 0;
+    font-size: 1.1rem;
+}
+
+.badge {
+    background: var(--bg-light);
+    color: var(--primary-color);
+    padding: 3px 10px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.card-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 10px;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.edit-card:hover .card-actions {
+    opacity: 1;
+}
+
+.action-btn {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: none;
+    background: var(--white);
+    color: var(--text-dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    transition: 0.2s;
+}
+
+.action-btn:hover {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.action-btn.delete:hover {
+    background: #e53e3e;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--white);
+    width: 100%;
+    max-width: 400px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+    animation: modalPop 0.3s ease;
+}
+
+@keyframes modalPop {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-modal {
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+/* Announcements Admin */
+.announcements-admin-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.ann-admin-card {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 5px solid var(--primary-light);
+}
+
+.ann-admin-card.pinned {
+    border-left-color: var(--primary-color);
+    background: #fff9fc;
+}
+
+.ann-admin-info h4 {
+    margin: 0 0 5px 0;
+    font-size: 1.2rem;
+}
+
+.ann-admin-info p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    max-width: 600px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* =========================================
+   COMPREHENSIVE RESPONSIVENESS
+   ========================================= */
+
+@media (max-width: 992px) {
+    .editable-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+    .ann-admin-info p {
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        border-bottom: 1px solid #e2e8f0;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        z-index: 20;
+    }
+    
+    .sidebar-header {
+        padding: 15px;
+    }
+    
+    .nav-menu {
+        display: flex;
+        overflow-x: auto;
+        padding: 0;
+        margin: 0;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none;  /* IE and Edge */
+    }
+    
+    .nav-menu::-webkit-scrollbar {
+        display: none; /* Chrome, Safari */
+    }
+    
+    .nav-menu li {
+        flex: 0 0 auto;
+    }
+    
+    .nav-menu li a {
+        padding: 15px 20px;
+        white-space: nowrap;
+        border-right: none;
+        border-bottom: 4px solid transparent;
+    }
+    
+    .nav-menu li.active a, .nav-menu li a:hover {
+        border-right: none;
+        border-bottom: 4px solid var(--primary-color);
+        background: transparent;
+    }
+    
+    .topbar {
+        padding: 15px 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .topbar h2 {
+        font-size: 1.3rem;
+        margin: 0;
+    }
+    
+    .gallery-manager {
+        padding: 20px 15px;
+    }
+    
+    .manager-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+    
+    .action-buttons {
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 10px;
+    }
+    
+    .action-buttons .btn {
+        flex: 1;
+        justify-content: center;
+        text-align: center;
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+    
+    .ann-admin-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .ann-admin-info p {
+        max-width: 100%;
+        white-space: normal;
+    }
+    
+    .ann-admin-card .action-buttons {
+        align-self: flex-start;
+        width: auto;
+    }
+    
+    .upload-zone {
+        padding: 30px 15px;
+        margin-bottom: 25px;
+    }
+    
+    .upload-content i {
+        font-size: 2rem;
+    }
+    
+    .upload-content h3 {
+        font-size: 1.1rem;
+    }
+    
+    .form-group input, 
+    .form-group select, 
+    .form-group textarea {
+        font-size: 16px; /* Prevents zoom on iOS Safari */
+    }
+    
+    .auth-card {
+        margin: 0 15px;
+        padding: 30px 20px;
+    }
+    
+    .modal-content {
+        max-width: 90%;
+        max-height: 85vh;
+    }
+    
+    .modal-header {
+        padding: 15px 20px;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+}

@@ -34,15 +34,12 @@
     <header id="home" class="hero">
         <div class="hero-content">
             <h1>Where Every Child Blooms <i class="fa-solid fa-asterisk"></i></h1>
-            <p>Welcome to Aarambh School, a safe, nurturing, and joyful place where your child takes their first steps
-                towards a bright future.</p>
-            <a href="#admissions" class="btn btn-primary">Enroll Now</a>
+            <p>Welcome to Aarambh The Pre-school, a safe, nurturing, and joyful place where your child takes their first steps towards a bright future.</p>
+            <a href="#tour-media" class="btn btn-primary">Click to our school tour</a>
         </div>
         <div class="hero-image">
             <div class="hero-image-wrapper">
-                <div class="blob-shape"
-                    style="background-image: url('img/hero1.jpg');">
-                </div>
+                <div class="blob-shape" style="background-image: url('img/hero1.jpg');"></div>
                 <!-- Decorative floating elements -->
                 <div class="floating-icon icon-1"><i class="fa-solid fa-star"></i></div>
                 <div class="floating-icon icon-2"><i class="fa-solid fa-music"></i></div>
@@ -54,7 +51,20 @@
         <div class="wave"></div>
     </header>
 
-    <!-- About Us Section -->
+    <!-- Announcements Section -->
+    <section id="announcements" class="announcements-section">
+        <div class="container">
+            <div class="announcement-card">
+                <div class="announcement-header">
+                    <div class="bell-icon"><i class="fa-solid fa-bell"></i></div>
+                    <h3>Important Updates</h3>
+                </div>
+                <!-- Dynamic Announcements injected here via script.js -->
+                <div id="dynamic-announcements" class="dynamic-announcements-grid">
+                </div>
+            </div>
+        </div>
+    </section>    <!-- About Us Section -->
     <section id="about" class="about">
         <div class="container">
             <div class="section-title">
@@ -66,7 +76,7 @@
                     <img src="img/about.jpg"
                         alt="Teacher reading to children" />
                     <div class="experience-badge">
-                        <span>10+</span> Years of<br />Excellence
+                        <span>20+</span> Years of<br />Excellence
                     </div>
                 </div>
                 <div class="about-text">
@@ -115,28 +125,67 @@
                 <div class="program-card">
                     <div class="card-icon"><i class="fa-solid fa-baby"></i></div>
                     <h3>Baby Nursery</h3>
-                    <span class="age">Age: 2 - 3 Years</span>
-                    <p>Focuses on sensory development, motor skills, and social interaction through unstructured play.
-                    </p>
+                    <ul class="program-list">
+                        <li><span class="year-highlight">2 to 3 years</span> — Playgroup</li>
+                        <li><span class="year-highlight">3 to 4 years</span> — Nursery</li>
+                    </ul>
+                    <p>Focuses on sensory development, motor skills, and foundational social interaction.</p>
                 </div>
 
                 <div class="program-card">
                     <div class="card-icon"><i class="fa-solid fa-shapes"></i></div>
                     <h3>LKG</h3>
-                    <span class="age">Age: 3 - 4 Years</span>
-                    <p>Introduces basic alphabets, numbers, rhymes, and creative arts in an engaging environment.</p>
+                    <ul class="program-list">
+                        <li><span class="year-highlight">4 to 5 years</span> — LKG</li>
+                        <li><span class="year-highlight">5 to 6 years</span> — UKG</li>
+                    </ul>
+                    <p>Introduces basic alphabets, numbers, and creative arts in an engaging environment.</p>
                 </div>
 
                 <div class="program-card">
                     <div class="card-icon"><i class="fa-solid fa-school"></i></div>
                     <h3>UKG</h3>
-                    <span class="age">Age: 4 - 5 Years</span>
-                    <p>Prepares children for primary school with foundational reading, writing, and logical skills.</p>
+                    <ul class="program-list">
+                        <li><span class="year-highlight">6 to 7 years</span> — Grade 1</li>
+                        <li><span class="year-highlight">7 to 8 years</span> — Grade 2</li>
+                    </ul>
+                    <p>Prepares children with foundational reading, writing, and logical skills.</p>
+                </div>
+
+                <div class="program-card">
+                    <div class="card-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <h3>Primary Classes</h3>
+                    <ul class="program-list">
+                        <li><span class="year-highlight">8 to 9 years</span> — Grade 3</li>
+                        <li><span class="year-highlight">9 to 10 years</span> — Grade 4</li>
+                        <li><span class="year-highlight">10 to 11 years</span> — Grade 5</li>
+                    </ul>
+                    <p>Prepares your child to soar into higher classes with ease and confidence.</p>
                 </div>
             </div>
         </div>
-    </section>
+    </section>    <!-- Dynamic School Tour Media Section -->
+    <section id="tour-media" class="tour-media-section" style="display: none;">
+        <!-- Decorative Background Layer -->
+        <div class="media-bg-overlay"></div>
 
+        <div class="tour-media-content flex-column-layout">
+            <div class="tour-header text-center">
+                <h2 id="frontend-media-title" class="gradient-text">School Tour</h2>
+                <div class="divider" style="margin: 0 auto 20px;"></div>
+                <p id="frontend-media-desc" class="media-desc">Discover our beautiful campus, state-of-the-art facilities, and the joyous environment where children thrive.</p>
+            </div>
+            
+            <div class="media-player-wrapper" id="media-player-container">
+                <!-- Javascript will inject video/audio player here -->
+                <div class="loading-spinner" id="media-loader"></div>
+            </div>
+            
+            <div class="tour-footer text-center">
+                <a href="#admissions" class="btn btn-primary btn-large" style="box-shadow: 0 10px 20px rgba(0,0,0,0.3);">Book a Campus Visit</a>
+            </div>
+        </div>
+    </section>
     <!-- Faculty Section -->
     <section id="faculty" class="faculty">
         <div class="container">
@@ -153,9 +202,9 @@
                             alt="Sarah Johnson" />
                     </div>
                     <div class="faculty-info">
-                        <h3>Sarah Johnson</h3>
-                        <span>Lead Nursery Teacher</span>
-                        <p>With over 8 years of experience, Sarah brings patience, joy, and boundless creativity to
+                        <h3>Ms.Sudha</h3>
+                        <span>Lead Primary Teacher</span>
+                        <p>With over 20 years of experience, Ms.Sudha brings patience, joy, and boundless creativity to
                             every class.</p>
                     </div>
                 </div>
@@ -166,9 +215,9 @@
                             alt="Michael Davis" />
                     </div>
                     <div class="faculty-info">
-                        <h3>Michael Davis</h3>
-                        <span>UKG Coordinator</span>
-                        <p>Michael specializes in foundational literacy and numeracy, ensuring kids are confident and
+                        <h3>Ms.lavanya</h3>
+                        <span>Lead kindergarten Teacher</span>
+                        <p>With over 15 years of experience Ms.lavanya specializes in foundational literacy and numeracy, ensuring kids are confident and
                             ready for primary school.</p>
                     </div>
                 </div>
@@ -179,9 +228,9 @@
                             alt="Emily Chen" />
                     </div>
                     <div class="faculty-info">
-                        <h3>Emily Chen</h3>
-                        <span>LKG Teacher & Arts</span>
-                        <p>A passionate artist, Emily incorporates visual crafts into learning, nurturing creative
+                        <h3>Ms.Radhika</h3>
+                        <span>Lead Preprimary Teacher</span>
+                        <p>With over 15 years of experience, Ms.Radhika incorporates visual crafts into learning, nurturing creative
                             self-expression.</p>
                     </div>
                 </div>
@@ -227,20 +276,11 @@
                     <h3>Required Documents <i class="fa-solid fa-folder-open"></i></h3>
                     <ul>
                         <li><i class="fa-solid fa-check"></i> Birth Certificate of the child</li>
-                        <li><i class="fa-solid fa-check"></i> 4 Passport size photographs</li>
-                        <li><i class="fa-solid fa-check"></i> Aadhaar/ID proof of parents</li>
-                        <li><i class="fa-solid fa-check"></i> Medical certificate/vaccination record</li>
+                        <li><i class="fa-solid fa-check"></i> 2 Passport size photographs</li>
+                        <li><i class="fa-solid fa-check"></i> Aadhaar Card copy of the child and parents</li>
+                        <!-- <li><i class="fa-solid fa-check"></i> Medical certificate/vaccination record</li> -->
                     </ul>
-                    <div class="admissions-actions" style="width: 100%; display: flex; flex-direction: column;">
-                        <a href="#contact" class="btn btn-secondary" style="width: 100%; text-align: center; box-sizing: border-box;">Contact Reception</a>
-                        
-                        <div class="whatsapp-box">
-                            <span>Prefer direct chat? Message us instantly:</span>
-                            <a href="https://wa.me/919876543210" target="_blank" class="btn btn-whatsapp" style="width: 100%; box-sizing: border-box;">
-                                <i class="fa-brands fa-whatsapp" style="font-size: 1.3rem;"></i> Chat on WhatsApp
-                            </a>
-                        </div>
-                    </div>
+                    <a href="#contact" class="btn btn-secondary">Contact Reception</a>
                 </div>
             </div>
         </div>
@@ -323,12 +363,7 @@
                     <p>Aarambh Pre-Primary</p>
                     <span class="btn-outline">Like Page</span>
                 </a>
-                <a href="#" class="social-card youtube">
-                    <div class="social-icon"><i class="fa-brands fa-youtube"></i></div>
-                    <h3>YouTube</h3>
-                    <p>Aarambh Kids TV</p>
-                    <span class="btn-outline">Subscribe</span>
-                </a>
+               
             </div>
         </div>
     </section>
@@ -366,14 +401,15 @@
                             <i class="fa-solid fa-phone"></i>
                             <div>
                                 <h4>Call Us</h4>
-                                <p>+1 (234) 567-8900</p>
+                                <p>+91 7702022855</p>
+                                <p>+91 9849386227</p>
                             </div>
                         </div>
                         <div class="info-item">
                             <i class="fa-solid fa-envelope"></i>
                             <div>
                                 <h4>Email Us</h4>
-                                <p>hello@aarambhschool.edu</p>
+                                <p>aarambhpreprimary2020@gmail.com</p>
                             </div>
                         </div>
                         <div class="info-item">
@@ -418,12 +454,13 @@
                     <li><a href="#faculty">Faculty</a></li>
                     <li><a href="#admissions">Admissions</a></li>
                     <li><a href="#gallery">Gallery</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
                 </ul>
             </div>
             <div class="footer-working-hours">
-                <h4>Working Hours</h4>
+                <h4>Office Hours</h4>
                 <ul>
-                    <li>Mon - Fri: 8:00 AM - 4:00 PM</li>
+                    <li>Mon - Fri: 9:00 AM - 4:30 PM</li>
                     <li>Saturday: 9:00 AM - 1:00 PM</li>
                     <li>Sunday: Closed</li>
                 </ul>
