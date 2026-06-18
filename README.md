@@ -1,46 +1,74 @@
-# Aarambh Pre-Primary School Website
+# Aarambh Pre-Primary School
 
-![Aarambh School Logo](img/schoollogo_transparent.png)
+![Aarambh School Logo](public/img/schoollogo_transparent.png)
 
-A modern, fully responsive, and beautifully designed landing page for a pre-primary school. Built with a focus on clean aesthetics, joyful micro-interactions, and high performance.
+A modern, fully responsive, full-stack application for a pre-primary school. Built with a focus on clean aesthetics, joyful micro-interactions, and a powerful custom admin dashboard for content management.
 
-## 🌟 Live Demo
-*Can be deployed instantly on Vercel or GitHub Pages.*
+## 🌟 Live Website
+**Public Site:** [https://arambh-bpuc.onrender.com/](https://arambh-bpuc.onrender.com/)  
+**Admin Panel:** [https://arambh-bpuc.onrender.com/admin.html](https://arambh-bpuc.onrender.com/admin.html)
+
+## 🛠️ Technology Stack
+
+### Frontend (Public Site & Admin Panel)
+- **HTML5 & CSS3:** Custom-designed UI with glassmorphism and vibrant, child-friendly color palettes (No external CSS frameworks used).
+- **Vanilla JavaScript (ES6):** Powers all interactive animations, mobile navigation, and dynamic gallery filtering via Fetch API.
+- **Fonts & Icons:** FontAwesome (Icons), Google Fonts (Nunito, Outfit).
+
+### Backend (API Server)
+- **Node.js & Express.js:** Handles routing, API endpoints, and serves the static frontend.
+- **JWT & Bcryptjs:** Enterprise-grade security for the Admin Panel authentication.
+- **Multer:** Middleware for processing multipart/form-data (image uploads).
+
+### Database & Storage
+- **Supabase (PostgreSQL):** Cloud database storing gallery metadata, announcements, and admin credentials.
+- **Cloudinary:** Cloud media server for fast, optimized image hosting.
+
+### Hosting & Deployment
+- **Render.com:** Hosts the Node.js server and handles automatic deployments.
+- **GitHub:** Version control and CI/CD source.
 
 ## 🚀 Features
-- **Zero Dependencies:** Built entirely with pure Vanilla HTML5, CSS3, and JavaScript. No build steps required.
-- **Glassmorphism UI:** Features premium translucent styling and vibrant, child-friendly color palettes.
+- **Dynamic Image Gallery:** Upload, delete, and categorize images via the Admin Panel. Images are stored in Cloudinary and instantly reflect on the public site.
+- **Real-time Announcements:** Pin important announcements to the top of the homepage using the Admin dashboard.
+- **Secure Admin Dashboard:** Protected by JWT authentication and password encryption.
 - **Fully Responsive:** Adapts flawlessly to mobile phones, tablets, and desktop displays using modern CSS Flexbox and Grid.
-- **Dynamic Gallery:** Includes a built-in, lightweight JavaScript filtering system to sort gallery images instantly without reloading.
-- **Smooth Navigation:** Sticky navbar with smooth anchor scrolling and auto-collapsing mobile menus.
 
-## 📂 Project Structure
-```text
-/
-├── index.html        # Main entry point containing semantic HTML structure
-├── style.css         # Styling, animations, and responsive media queries
-├── script.js         # Navigation logic, scroll handlers, and gallery filtering
-└── img/              # All optimized image assets and transparent logos
-```
+## 💻 Local Development Setup
 
-## 🛠️ How to Deploy
-Because this project uses zero frameworks and has no build step, deployment is instantaneous!
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/irfanpc/arambh.git
+   cd arambh
+   ```
 
-**Deploying to Vercel:**
-1. Upload this repository to GitHub.
-2. Go to Vercel.com and click **Add New Project**.
-3. Import your GitHub repository.
-4. Leave all build settings at their defaults (Vercel will detect it as a static site).
-5. Click **Deploy**!
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-**Deploying to GitHub Pages:**
-1. Upload this repository to GitHub.
-2. Go to the repository **Settings** > **Pages**.
-3. Under "Source", select the `main` branch.
-4. Click **Save** and your site will be live!
+3. **Set up Environment Variables:**
+   Create a `.env` file in the root directory and add your credentials:
+   ```env
+   PORT=5000
+   DATABASE_URL=your_supabase_postgresql_url
+   JWT_SECRET=your_jwt_secret
+   JWT_EXPIRES_IN=1d
+   ADMIN_USERNAME=admin
+   ADMIN_PASSWORD=your_secure_password
+   
+   CLOUDINARY_CLOUD_NAME=your_cloudinary_name
+   CLOUDINARY_API_KEY=your_cloudinary_key
+   CLOUDINARY_API_SECRET=your_cloudinary_secret
+   ```
 
-## 💻 Local Development
-To work on this locally, simply double-click the `index.html` file to open it in your browser. No local server or Node.js environment is required.
+4. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open in browser:**
+   Navigate to `http://localhost:5000`
 
 ---
-*Designed with ❤️ for early childhood education.*
+&copy; 2026 Aarambh Pre-Primary School. All Rights Reserved.
