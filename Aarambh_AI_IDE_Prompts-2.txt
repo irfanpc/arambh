@@ -1,0 +1,1120 @@
+================================================================================
+  AARAMBH PRE-PRIMARY SCHOOL — AI IDE BUILD PROMPTS
+  For Irfan · Use with Claude Code / Cursor / GitHub Copilot Chat
+  Run prompts IN ORDER. Each prompt builds on the previous one.
+  Version 1.0 · May 2026
+================================================================================
+
+HOW TO USE THIS FILE
+────────────────────
+1. Open your AI IDE (Claude Code, Cursor, or Copilot Chat)
+2. Run Prompt 1 first. Wait for it to complete fully.
+3. Run the next prompt only after the previous one is done.
+4. If you see an error, scroll to the "TROUBLESHOOTING" section at the bottom.
+   Copy the error and paste it to Claude with the exact phrase shown.
+5. Never skip a prompt — each one depends on the previous.
+
+════════════════════════════════════════════════════════════════════════════════
+PROMPT 1 — MONOREPO SCAFFOLD
+════════════════════════════════════════════════════════════════════════════════
+
+Create a Node.js/Express monorepo for a school website backend called "aarambh".
+
+Set up this exact folder and file structure:
+
+aarambh/
+├── package.json              (root — npm workspaces)
+├── .gitignore
+├── .env.example
+├── frontend/                 (leave this folder empty — I will copy files in)
+└── backend/
+    ├── package.json
+    ├── server.js
+    ├── app.js
+    ├── config/
+    │   ├── db.js
+    │   └── cloudinary.js
+    ├── middleware/
+    │   ├── auth.js
+    │   ├── upload.js
+    │   └── errorHandler.js
+    ├── models/               (empty for now — we use raw SQL)
+    ├── routes/
+    │   ├── auth.js
+    │   ├── gallery.js
+    │   ├── announcements.js
+    │   └── media.js
+    ├── controllers/
+    │   ├── authController.js
+    │   ├── galleryController.js
+    │   ├── announcementController.js
+    │   └── mediaController.js
+    ├── migrations/
+    │   └── 001_init.sql
+    └── scripts/
+        └── seed.js
+
+Root package.json should use npm workspaces pointing to ["frontend","backend"].
+
+backend/package.json dependencies:
+- express ^4.18.2
+- cors ^2.8.5
+- dotenv ^16.3.1
+- jsonwebtoken ^9.0.2
+- bcryptjs ^2.4.3
+- pg ^8.11.3
+- multer ^1.4.5-lts.1
+- multer-storage-cloudinary ^4.0.0
+- cloudinary ^1.41.3
+- express-validator ^7.0.1
+- helmet ^7.1.0
+
+devDependencies: nodemon ^3.0.1
+
+scripts: "start": "node server.js", "dev": "nodemon server.js"
+
+After creating all files, run: npm install inside backend/
+
+Do NOT write any logic yet — just create the scaffold with empty files and
+the package.json files properly configured. Leave all .js files with just a
+comment: // TODO
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROMPT 2 — ENVIRONMENT & DATABASE CONNECTION
+════════════════════════════════════════════════════════════════════════════════
+
+Now fill in the backend configuration files. Use the exact code below.
+
+── .env.example ────────────────────────────────────────────────────────────────
+PORT=5000
+NODE_ENV=development
+DATABASE_URL=postgresql://user:password@host:5432/aarambh_db
+JWT_SECRET=replace_with_64_char_random_string
+JWT_EXPIRES_IN=7d
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=aarambh@2026
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+FRONTEND_URL=http://localhost:3000
+
+── backend/config/db.js ────────────────────────────────────────────────────────
+const { Pool } = require('pg');
+require('dotenv').config();
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production'
+    ? { rejectUnauthorized: false }
+    : false,
+});
+
+pool.on('error', (err) => {
+  console.error('Unexpected DB error', err);
+  process.exit(-1);
+});
+
+module.exports = pool;
+
+── backend/config/cloudinary.js ────────────────────────────────────────────────
+const cloudinary = require('cloudinary').v2;
+require('dotenv').config();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+module.exports = cloudinary;
+
+── backend/server.js ───────────────────────────────────────────────────────────
+require('dotenv').config();
+const app  = require('./app');
+const pool = require('./config/db');
+
+const PORT = process.env.PORT || 5000;
+
+async function start() {
+  try {
+    await pool.query('SELECT 1'); // test DB connection
+    console.log('✅ Database connected');
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+  } catch (err) {
+    console.error('❌ DB connection failed:', err.message);
+    process.exit(1);
+  }
+}
+start();
+
+── backend/app.js ──────────────────────────────────────────────────────────────
+const express     = require('express');
+const cors        = require('cors');
+const helmet      = require('helmet');
+const errorHandler = require('./middleware/errorHandler');
+require('dotenv').config();
+
+const app = express();
+
+app.use(helmet());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || '*',
+  credentials: true,
+}));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Routes
+app.use('/api/auth',          require('./routes/auth'));
+app.use('/api/gallery',       require('./routes/gallery'));
+app.use('/api/announcements', require('./routes/announcements'));
+app.use('/api/media',         require('./routes/media'));
+
+// Health check
+app.get('/health', (_, res) => res.json({ status: 'ok', timestamp: new Date() }));
+
+app.use(errorHandler);
+module.exports = app;
+
+── backend/middleware/errorHandler.js ──────────────────────────────────────────
+module.exports = function errorHandler(err, req, res, next) {
+  console.error('[ERROR]', err.stack || err.message);
+  const status = err.statusCode || err.status || 500;
+  res.status(status).json({
+    error: err.message || 'Internal server error',
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+  });
+};
+
+After filling all these files, create a backend/.env file (copy from .env.example)
+and fill in a real DATABASE_URL. Then run: cd backend && npm run dev
+Tell me if you see "Database connected" or any error.
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROMPT 3 — DATABASE MIGRATION
+════════════════════════════════════════════════════════════════════════════════
+
+Fill in backend/migrations/001_init.sql with this exact SQL. Then run it
+against the PostgreSQL database.
+
+── backend/migrations/001_init.sql ─────────────────────────────────────────────
+
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- Admins
+CREATE TABLE IF NOT EXISTS admins (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  username   VARCHAR(50) UNIQUE NOT NULL,
+  password   TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Gallery Images
+CREATE TABLE IF NOT EXISTS gallery_images (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title         VARCHAR(200) NOT NULL DEFAULT 'Untitled',
+  category      VARCHAR(50) NOT NULL DEFAULT 'classroom'
+                CHECK (category IN ('classroom','activity','event')),
+  cloudinary_id TEXT NOT NULL,
+  url           TEXT NOT NULL,
+  sort_order    INTEGER NOT NULL DEFAULT 0,
+  created_at    TIMESTAMPTZ DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_gallery_category ON gallery_images(category);
+CREATE INDEX IF NOT EXISTS idx_gallery_sort ON gallery_images(sort_order);
+
+-- Announcements
+CREATE TABLE IF NOT EXISTS announcements (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title         VARCHAR(300) NOT NULL,
+  message       TEXT NOT NULL,
+  ann_date      DATE NOT NULL,
+  status        VARCHAR(20) NOT NULL DEFAULT 'New'
+                CHECK (status IN ('New','Event','Alert','Holiday')),
+  pinned        BOOLEAN NOT NULL DEFAULT FALSE,
+  btn_text      VARCHAR(100),
+  btn_link      VARCHAR(500),
+  image_url     TEXT,
+  cloudinary_id TEXT,
+  created_at    TIMESTAMPTZ DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_ann_pinned ON announcements(pinned DESC, ann_date DESC);
+
+-- Tour Media
+CREATE TABLE IF NOT EXISTS tour_media (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title         VARCHAR(200) NOT NULL DEFAULT 'School Tour',
+  description   TEXT,
+  media_type    VARCHAR(10) NOT NULL DEFAULT 'video'
+                CHECK (media_type IN ('video','audio')),
+  src_type      VARCHAR(20) NOT NULL DEFAULT 'youtube'
+                CHECK (src_type IN ('youtube','mp4','audio-url','cloudinary')),
+  src           TEXT NOT NULL,
+  thumbnail_url TEXT,
+  is_deleted    BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at    TIMESTAMPTZ DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Auto-update updated_at
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS TRIGGER AS $$ BEGIN
+  NEW.updated_at = NOW(); RETURN NEW;
+END; $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_gallery_updated
+  BEFORE UPDATE ON gallery_images
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE OR REPLACE TRIGGER trg_ann_updated
+  BEFORE UPDATE ON announcements
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE OR REPLACE TRIGGER trg_media_updated
+  BEFORE UPDATE ON tour_media
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+─────────────────────────────────────────────────────────────────────────────────
+
+To run the migration, execute this in the backend/ folder:
+  node -e "require('dotenv').config(); const {Pool}=require('pg');
+  const p=new Pool({connectionString:process.env.DATABASE_URL,
+  ssl:{rejectUnauthorized:false}});
+  const fs=require('fs');
+  p.query(fs.readFileSync('./migrations/001_init.sql','utf8'))
+  .then(()=>{console.log('Migration done');process.exit(0)})
+  .catch(e=>{console.error(e);process.exit(1)})"
+
+Tell me the output.
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROMPT 4 — SEED ADMIN USER
+════════════════════════════════════════════════════════════════════════════════
+
+Fill in backend/scripts/seed.js and run it to create the admin user.
+
+── backend/scripts/seed.js ─────────────────────────────────────────────────────
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+const pool   = require('../config/db');
+const bcrypt = require('bcryptjs');
+
+async function seed() {
+  const username = process.env.ADMIN_USERNAME || 'admin';
+  const password = process.env.ADMIN_PASSWORD || 'aarambh@2026';
+  const hash     = await bcrypt.hash(password, 12);
+
+  const { rows } = await pool.query(
+    `INSERT INTO admins (username, password)
+     VALUES ($1, $2)
+     ON CONFLICT (username) DO UPDATE SET password = EXCLUDED.password
+     RETURNING id, username`,
+    [username, hash]
+  );
+
+  console.log('✅ Admin seeded:', rows[0]);
+  await pool.end();
+  process.exit(0);
+}
+
+seed().catch(err => {
+  console.error('❌ Seed failed:', err.message);
+  process.exit(1);
+});
+
+─────────────────────────────────────────────────────────────────────────────────
+
+Run with: cd backend && node scripts/seed.js
+
+Expected output:
+  ✅ Admin seeded: { id: 'some-uuid', username: 'admin' }
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROMPT 5 — AUTH MIDDLEWARE & CONTROLLER
+════════════════════════════════════════════════════════════════════════════════
+
+Fill in the auth middleware and controller.
+
+── backend/middleware/auth.js ───────────────────────────────────────────────────
+const jwt = require('jsonwebtoken');
+
+module.exports = function verifyToken(req, res, next) {
+  const header = req.headers['authorization'];
+  if (!header || !header.startsWith('Bearer '))
+    return res.status(401).json({ error: 'No token provided' });
+
+  const token = header.split(' ')[1];
+  try {
+    req.admin = jwt.verify(token, process.env.JWT_SECRET);
+    next();
+  } catch (err) {
+    return res.status(403).json({ error: 'Invalid or expired token' });
+  }
+};
+
+── backend/controllers/authController.js ───────────────────────────────────────
+const pool   = require('../config/db');
+const bcrypt = require('bcryptjs');
+const jwt    = require('jsonwebtoken');
+
+exports.login = async (req, res, next) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password)
+      return res.status(400).json({ error: 'Username and password required' });
+
+    const { rows } = await pool.query(
+      'SELECT * FROM admins WHERE username = $1', [username]
+    );
+    if (!rows.length)
+      return res.status(401).json({ error: 'Invalid credentials' });
+
+    const valid = await bcrypt.compare(password, rows[0].password);
+    if (!valid)
+      return res.status(401).json({ error: 'Invalid credentials' });
+
+    const token = jwt.sign(
+      { id: rows[0].id, username: rows[0].username },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    );
+    res.json({ token, username: rows[0].username });
+  } catch (err) { next(err); }
+};
+
+exports.verify = async (req, res) => {
+  res.json({ valid: true, admin: req.admin });
+};
+
+── backend/routes/auth.js ──────────────────────────────────────────────────────
+const router = require('express').Router();
+const ctrl   = require('../controllers/authController');
+const auth   = require('../middleware/auth');
+
+router.post('/login',  ctrl.login);
+router.get('/verify',  auth, ctrl.verify);
+
+module.exports = router;
+
+─────────────────────────────────────────────────────────────────────────────────
+
+Test with curl (or Thunder Client / Postman):
+  POST http://localhost:5000/api/auth/login
+  Body: { "username": "admin", "password": "aarambh@2026" }
+
+Expected: { "token": "eyJ...", "username": "admin" }
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROMPT 6 — UPLOAD MIDDLEWARE
+════════════════════════════════════════════════════════════════════════════════
+
+Fill in backend/middleware/upload.js for Cloudinary file uploads.
+
+── backend/middleware/upload.js ────────────────────────────────────────────────
+const multer  = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('../config/cloudinary');
+
+function makeStorage(folder, allowedFormats = ['jpg','jpeg','png','webp']) {
+  return new CloudinaryStorage({
+    cloudinary,
+    params: {
+      folder: `aarambh/${folder}`,
+      allowed_formats: allowedFormats,
+      resource_type: 'auto',
+      transformation: [{ quality: 'auto', fetch_format: 'auto' }],
+    },
+  });
+}
+
+const galleryUpload = multer({
+  storage: makeStorage('gallery'),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith('image/'))
+      return cb(new Error('Only image files allowed'));
+    cb(null, true);
+  },
+});
+
+const announcementUpload = multer({
+  storage: makeStorage('announcements'),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith('image/'))
+      return cb(new Error('Only image files allowed'));
+    cb(null, true);
+  },
+});
+
+const mediaUpload = multer({
+  storage: makeStorage('media', ['jpg','jpeg','png','webp','mp4','mp3','wav']),
+  limits: { fileSize: 50 * 1024 * 1024 },
+});
+
+module.exports = { galleryUpload, announcementUpload, mediaUpload };
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROMPT 7 — GALLERY CRUD
+════════════════════════════════════════════════════════════════════════════════
+
+Fill in the gallery controller and routes with full CRUD.
+
+── backend/controllers/galleryController.js ────────────────────────────────────
+const pool       = require('../config/db');
+const cloudinary = require('../config/cloudinary');
+
+exports.getAll = async (req, res, next) => {
+  try {
+    const { rows } = await pool.query(
+      'SELECT * FROM gallery_images ORDER BY sort_order ASC, created_at ASC'
+    );
+    res.json(rows);
+  } catch (err) { next(err); }
+};
+
+exports.getOne = async (req, res, next) => {
+  try {
+    const { rows } = await pool.query(
+      'SELECT * FROM gallery_images WHERE id = $1', [req.params.id]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'Not found' });
+    res.json(rows[0]);
+  } catch (err) { next(err); }
+};
+
+exports.create = async (req, res, next) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'Image file required' });
+    const { title = 'Untitled', category = 'classroom' } = req.body;
+    const { rows } = await pool.query(
+      `INSERT INTO gallery_images (title, category, cloudinary_id, url, sort_order)
+       VALUES ($1, $2, $3, $4,
+         (SELECT COALESCE(MAX(sort_order) + 1, 0) FROM gallery_images))
+       RETURNING *`,
+      [title, category, req.file.filename, req.file.path]
+    );
+    res.status(201).json(rows[0]);
+  } catch (err) { next(err); }
+};
+
+exports.update = async (req, res, next) => {
+  try {
+    const { title, category } = req.body;
+    const { rows } = await pool.query(
+      `UPDATE gallery_images
+       SET title=$1, category=$2
+       WHERE id=$3
+       RETURNING *`,
+      [title, category, req.params.id]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'Not found' });
+    res.json(rows[0]);
+  } catch (err) { next(err); }
+};
+
+exports.reorder = async (req, res, next) => {
+  try {
+    const { order } = req.body; // [{ id, sort_order }, ...]
+    if (!Array.isArray(order))
+      return res.status(400).json({ error: 'order must be an array' });
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      for (const item of order) {
+        await client.query(
+          'UPDATE gallery_images SET sort_order=$1 WHERE id=$2',
+          [item.sort_order, item.id]
+        );
+      }
+      await client.query('COMMIT');
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
+    }
+    res.json({ message: 'Reordered successfully' });
+  } catch (err) { next(err); }
+};
+
+exports.remove = async (req, res, next) => {
+  try {
+    const { rows } = await pool.query(
+      'DELETE FROM gallery_images WHERE id=$1 RETURNING cloudinary_id',
+      [req.params.id]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'Not found' });
+    try {
+      await cloudinary.uploader.destroy(rows[0].cloudinary_id);
+    } catch (e) {
+      console.warn('Cloudinary delete warning:', e.message);
+    }
+    res.json({ message: 'Deleted' });
+  } catch (err) { next(err); }
+};
+
+── backend/routes/gallery.js ───────────────────────────────────────────────────
+const router = require('express').Router();
+const ctrl   = require('../controllers/galleryController');
+const auth   = require('../middleware/auth');
+const { galleryUpload } = require('../middleware/upload');
+
+router.get('/',              ctrl.getAll);
+router.get('/:id',           ctrl.getOne);
+router.post('/',   auth,     galleryUpload.single('image'), ctrl.create);
+router.put('/:id', auth,     ctrl.update);
+router.patch('/reorder', auth, ctrl.reorder);
+router.delete('/:id', auth,  ctrl.remove);
+
+module.exports = router;
+
+─────────────────────────────────────────────────────────────────────────────────
+
+Test:
+  GET  http://localhost:5000/api/gallery         → should return []
+  POST http://localhost:5000/api/gallery         → with auth header + image file
+       form-data: image=<file>, title="Test", category="classroom"
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROMPT 8 — ANNOUNCEMENTS CRUD
+════════════════════════════════════════════════════════════════════════════════
+
+Fill in the announcements controller and routes.
+
+── backend/controllers/announcementController.js ───────────────────────────────
+const pool       = require('../config/db');
+const cloudinary = require('../config/cloudinary');
+
+exports.getAll = async (req, res, next) => {
+  try {
+    const { rows } = await pool.query(
+      'SELECT * FROM announcements ORDER BY pinned DESC, ann_date DESC'
+    );
+    res.json(rows);
+  } catch (err) { next(err); }
+};
+
+exports.getOne = async (req, res, next) => {
+  try {
+    const { rows } = await pool.query(
+      'SELECT * FROM announcements WHERE id = $1', [req.params.id]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'Not found' });
+    res.json(rows[0]);
+  } catch (err) { next(err); }
+};
+
+exports.create = async (req, res, next) => {
+  try {
+    const { title, message, ann_date, status = 'New',
+            pinned = false, btn_text, btn_link } = req.body;
+    if (!title || !message || !ann_date)
+      return res.status(400).json({ error: 'title, message, ann_date required' });
+
+    const imageUrl     = req.file ? req.file.path     : null;
+    const cloudinaryId = req.file ? req.file.filename  : null;
+
+    const { rows } = await pool.query(
+      `INSERT INTO announcements
+         (title, message, ann_date, status, pinned, btn_text, btn_link, image_url, cloudinary_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+       RETURNING *`,
+      [title, message, ann_date, status, pinned, btn_text || null,
+       btn_link || null, imageUrl, cloudinaryId]
+    );
+    res.status(201).json(rows[0]);
+  } catch (err) { next(err); }
+};
+
+exports.update = async (req, res, next) => {
+  try {
+    const { title, message, ann_date, status, pinned, btn_text, btn_link } = req.body;
+    const imageUrl     = req.file ? req.file.path     : undefined;
+    const cloudinaryId = req.file ? req.file.filename  : undefined;
+
+    const existing = await pool.query(
+      'SELECT * FROM announcements WHERE id=$1', [req.params.id]
+    );
+    if (!existing.rows.length) return res.status(404).json({ error: 'Not found' });
+
+    const final_image_url     = imageUrl     ?? existing.rows[0].image_url;
+    const final_cloudinary_id = cloudinaryId ?? existing.rows[0].cloudinary_id;
+
+    const { rows } = await pool.query(
+      `UPDATE announcements SET
+         title=$1, message=$2, ann_date=$3, status=$4, pinned=$5,
+         btn_text=$6, btn_link=$7, image_url=$8, cloudinary_id=$9
+       WHERE id=$10 RETURNING *`,
+      [title, message, ann_date, status, pinned, btn_text || null,
+       btn_link || null, final_image_url, final_cloudinary_id, req.params.id]
+    );
+    res.json(rows[0]);
+  } catch (err) { next(err); }
+};
+
+exports.remove = async (req, res, next) => {
+  try {
+    const { rows } = await pool.query(
+      'DELETE FROM announcements WHERE id=$1 RETURNING cloudinary_id',
+      [req.params.id]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'Not found' });
+    if (rows[0].cloudinary_id) {
+      try { await cloudinary.uploader.destroy(rows[0].cloudinary_id); }
+      catch (e) { console.warn('Cloudinary delete warning:', e.message); }
+    }
+    res.json({ message: 'Deleted' });
+  } catch (err) { next(err); }
+};
+
+── backend/routes/announcements.js ─────────────────────────────────────────────
+const router = require('express').Router();
+const ctrl   = require('../controllers/announcementController');
+const auth   = require('../middleware/auth');
+const { announcementUpload } = require('../middleware/upload');
+
+router.get('/',          ctrl.getAll);
+router.get('/:id',       ctrl.getOne);
+router.post('/',   auth, announcementUpload.single('image'), ctrl.create);
+router.put('/:id', auth, announcementUpload.single('image'), ctrl.update);
+router.delete('/:id', auth, ctrl.remove);
+
+module.exports = router;
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROMPT 9 — TOUR MEDIA CRUD
+════════════════════════════════════════════════════════════════════════════════
+
+Fill in the tour media controller and routes.
+
+── backend/controllers/mediaController.js ──────────────────────────────────────
+const pool       = require('../config/db');
+const cloudinary = require('../config/cloudinary');
+
+exports.get = async (req, res, next) => {
+  try {
+    const { rows } = await pool.query(
+      'SELECT * FROM tour_media WHERE is_deleted = FALSE ORDER BY created_at DESC LIMIT 1'
+    );
+    if (!rows.length) return res.json(null);
+    res.json(rows[0]);
+  } catch (err) { next(err); }
+};
+
+exports.upsert = async (req, res, next) => {
+  try {
+    const { title, description, media_type = 'video',
+            src_type = 'youtube', src, thumbnail_url } = req.body;
+
+    if (!src && !req.file)
+      return res.status(400).json({ error: 'src or media_file required' });
+
+    const finalSrc          = req.file ? req.file.path     : src;
+    const finalSrcType      = req.file ? 'cloudinary'      : src_type;
+    const finalThumbnailUrl = thumbnail_url || null;
+
+    // Soft-delete old record
+    await pool.query('UPDATE tour_media SET is_deleted=TRUE WHERE is_deleted=FALSE');
+
+    const { rows } = await pool.query(
+      `INSERT INTO tour_media
+         (title, description, media_type, src_type, src, thumbnail_url)
+       VALUES ($1,$2,$3,$4,$5,$6)
+       RETURNING *`,
+      [title || 'School Tour', description || null, media_type,
+       finalSrcType, finalSrc, finalThumbnailUrl]
+    );
+    res.status(201).json(rows[0]);
+  } catch (err) { next(err); }
+};
+
+exports.remove = async (req, res, next) => {
+  try {
+    await pool.query(
+      'UPDATE tour_media SET is_deleted=TRUE WHERE is_deleted=FALSE'
+    );
+    res.json({ message: 'Tour media section hidden' });
+  } catch (err) { next(err); }
+};
+
+── backend/routes/media.js ─────────────────────────────────────────────────────
+const router = require('express').Router();
+const ctrl   = require('../controllers/mediaController');
+const auth   = require('../middleware/auth');
+const { mediaUpload } = require('../middleware/upload');
+
+router.get('/',           ctrl.get);
+router.post('/',    auth,  mediaUpload.single('media_file'), ctrl.upsert);
+router.delete('/', auth,   ctrl.remove);
+
+module.exports = router;
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROMPT 10 — UPDATE FRONTEND script.js
+════════════════════════════════════════════════════════════════════════════════
+
+Now update the frontend/script.js to fetch data from the API instead of
+localStorage. Add the API constant at the top and replace these three functions:
+loadGallery(), loadAnnouncements(), and loadTourMedia().
+
+Add at the very top of script.js (before any existing code):
+  const API_BASE = 'http://localhost:5000'; // change to Railway URL when deploying
+
+Replace the loadGallery() function with:
+
+async function loadGallery() {
+  if (!galleryGrid) return;
+  try {
+    const res  = await fetch(`${API_BASE}/api/gallery`);
+    const data = await res.json();
+    galleryGrid.innerHTML = '';
+    data.forEach(item => {
+      const div = document.createElement('div');
+      div.className = `gallery-item ${item.category} show`;
+      div.innerHTML = `
+        <img src="${item.url}" alt="${item.title}" loading="lazy"/>
+        <div class="overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+      `;
+      div.addEventListener('click', () => {
+        const lightbox    = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        if (lightbox && lightboxImg) {
+          lightboxImg.src = item.url;
+          lightbox.style.display = 'flex';
+        }
+      });
+      galleryGrid.appendChild(div);
+    });
+    bindFilters();
+  } catch (err) {
+    console.error('Gallery load failed:', err);
+  }
+}
+
+Replace the loadAnnouncements() function with:
+
+async function loadAnnouncements() {
+  const annGrid = document.getElementById('dynamic-announcements');
+  if (!annGrid) return;
+  try {
+    const res  = await fetch(`${API_BASE}/api/announcements`);
+    const data = await res.json();
+    annGrid.innerHTML = '';
+    data.forEach(ann => {
+      const card = document.createElement('div');
+      card.className = `ann-public-card ${ann.pinned ? 'pinned-card' : ''}`;
+      let imgHTML = ann.image_url
+        ? `<img src="${ann.image_url}" class="ann-card-img" alt="Announcement">`
+        : '';
+      let btnHTML = ann.btn_text && ann.btn_link
+        ? `<a href="${ann.btn_link}" class="btn btn-primary ann-btn">${ann.btn_text}</a>`
+        : '';
+      let pinHTML = ann.pinned
+        ? `<div class="pin-badge"><i class="fa-solid fa-thumbtack"></i> Pinned</div>`
+        : '';
+      card.innerHTML = `
+        ${pinHTML}${imgHTML}
+        <div class="ann-card-content">
+          <div class="ann-card-header">
+            <span class="date-badge ${ann.status.toLowerCase()}">${ann.status}</span>
+            <span class="ann-date"><i class="fa-regular fa-calendar"></i> ${ann.ann_date}</span>
+          </div>
+          <h4>${ann.title}</h4>
+          <p>${ann.message}</p>
+          ${btnHTML}
+        </div>`;
+      annGrid.appendChild(card);
+    });
+  } catch (err) {
+    console.error('Announcements load failed:', err);
+  }
+}
+
+Replace the loadTourMedia() function with:
+
+async function loadTourMedia() {
+  const mediaSection = document.getElementById('tour-media');
+  try {
+    const res  = await fetch(`${API_BASE}/api/media`);
+    const data = await res.json();
+    if (!data || data.is_deleted) { mediaSection.style.display = 'none'; return; }
+    mediaSection.style.display = 'block';
+    document.getElementById('frontend-media-title').textContent = data.title || 'School Tour';
+    document.getElementById('frontend-media-desc').textContent  = data.description || '';
+    const container = document.getElementById('media-player-container');
+    container.innerHTML = '';
+    if (data.src_type === 'youtube') {
+      container.innerHTML = `<iframe src="https://www.youtube.com/embed/${data.src}?controls=1"
+        frameborder="0" allowfullscreen></iframe>`;
+    } else {
+      container.innerHTML = `<video controls poster="${data.thumbnail_url || ''}">
+        <source src="${data.src}"></video>`;
+    }
+  } catch (err) {
+    console.error('Tour media load failed:', err);
+    if (mediaSection) mediaSection.style.display = 'none';
+  }
+}
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROMPT 11 — UPDATE FRONTEND admin.js
+════════════════════════════════════════════════════════════════════════════════
+
+Update frontend/admin.js to use the API instead of localStorage.
+
+Add at the very top:
+  const API_BASE = 'http://localhost:5000'; // change to Railway URL when deploying
+
+Replace the loginForm submit handler with this API-based version:
+
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  errorMsg.style.display = 'none';
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  try {
+    const res  = await fetch(`${API_BASE}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+    if (res.ok) {
+      const { token } = await res.json();
+      sessionStorage.setItem('aarambh_token', token);
+      loginScreen.style.display = 'none';
+      dashboardScreen.style.display = 'flex';
+      renderGallery();
+    } else {
+      const { error } = await res.json();
+      errorMsg.textContent = error || 'Invalid credentials';
+      errorMsg.style.display = 'block';
+    }
+  } catch (err) {
+    errorMsg.textContent = 'Cannot connect to server.';
+    errorMsg.style.display = 'block';
+  }
+});
+
+Add this helper at the top (after API_BASE):
+  function authHeader() {
+    return { 'Authorization': `Bearer ${sessionStorage.getItem('aarambh_token')}` };
+  }
+
+Replace the renderGallery function to load from API:
+
+async function renderGallery() {
+  editableGrid.innerHTML = '<p>Loading...</p>';
+  const res  = await fetch(`${API_BASE}/api/gallery`);
+  galleryData = await res.json();
+  editableGrid.innerHTML = '';
+  galleryData.forEach((img, index) => {
+    const card = document.createElement('div');
+    card.className = 'edit-card';
+    card.draggable = true;
+    card.dataset.index = index;
+    card.innerHTML = `
+      <img src="${img.url}" alt="${img.title}">
+      <div class="edit-card-info">
+        <h4>${img.title}</h4>
+        <span class="badge">${img.category}</span>
+      </div>
+      <div class="card-actions">
+        <button class="action-btn edit" onclick="openEditModal(${index})">
+          <i class="fa-solid fa-pen"></i></button>
+        <button class="action-btn delete" onclick="deleteImage('${img.id}')">
+          <i class="fa-solid fa-trash"></i></button>
+      </div>`;
+    card.addEventListener('dragstart', handleDragStart);
+    card.addEventListener('dragover', handleDragOver);
+    card.addEventListener('drop', handleDrop);
+    editableGrid.appendChild(card);
+  });
+}
+
+Replace the save-btn handler:
+
+document.getElementById('save-btn').addEventListener('click', async () => {
+  const token = sessionStorage.getItem('aarambh_token');
+  const order = galleryData.map((img, i) => ({ id: img.id, sort_order: i }));
+  const res = await fetch(`${API_BASE}/api/gallery/reorder`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...authHeader() },
+    body: JSON.stringify({ order }),
+  });
+  if (res.ok) alert('Gallery saved and published!');
+  else alert('Error saving gallery.');
+});
+
+Replace deleteImage:
+
+window.deleteImage = async function(id) {
+  if (!confirm('Delete this image?')) return;
+  const res = await fetch(`${API_BASE}/api/gallery/${id}`, {
+    method: 'DELETE',
+    headers: authHeader(),
+  });
+  if (res.ok) renderGallery();
+  else alert('Delete failed.');
+};
+
+For the upload zone, replace handleFiles to POST to API:
+
+function handleFiles(files) {
+  for (let file of files) {
+    if (!file.type.startsWith('image/')) continue;
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('title', 'New Image');
+    formData.append('category', 'classroom');
+    fetch(`${API_BASE}/api/gallery`, {
+      method: 'POST',
+      headers: authHeader(),
+      body: formData,
+    }).then(r => r.json()).then(img => {
+      galleryData.push(img);
+      renderGallery();
+      openEditModal(galleryData.length - 1);
+    });
+  }
+}
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROMPT 12 — FINAL TESTING & CORS CHECK
+════════════════════════════════════════════════════════════════════════════════
+
+Run the full system test:
+
+1. Start the backend: cd backend && npm run dev
+2. Open frontend/index.html in browser
+3. Check the browser console — gallery, announcements, tour media should all load from API
+4. Open frontend/admin.html in browser
+5. Login with admin / aarambh@2026
+6. Upload a new gallery image and verify it appears on the public site
+7. Create a new announcement and verify it appears on the public site
+
+If you see CORS errors in the browser console, add the frontend's localhost
+origin to CORS in app.js:
+
+app.use(cors({
+  origin: [
+    process.env.FRONTEND_URL,
+    'http://localhost:3000',
+    'http://127.0.0.1:5500',  // VS Code Live Server
+    'http://localhost:5500',
+  ],
+  credentials: true,
+}));
+
+After all tests pass, update API_BASE in both script.js and admin.js to your
+Railway production URL before deploying frontend to Vercel.
+
+
+════════════════════════════════════════════════════════════════════════════════
+PROMPT 13 — DEPLOY TO PRODUCTION
+════════════════════════════════════════════════════════════════════════════════
+
+Deploy the backend to Railway and frontend to Vercel.
+
+For Railway:
+1. Push your monorepo to GitHub
+2. Go to railway.app → New Project → Deploy from GitHub Repo
+3. When asked for root directory, set it to: backend
+4. Add these environment variables in the Railway dashboard:
+   - DATABASE_URL        (from Neon.tech)
+   - JWT_SECRET          (generate: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))")
+   - JWT_EXPIRES_IN      = 7d
+   - NODE_ENV            = production
+   - ADMIN_USERNAME      = admin
+   - ADMIN_PASSWORD      = (choose a strong password)
+   - CLOUDINARY_CLOUD_NAME
+   - CLOUDINARY_API_KEY
+   - CLOUDINARY_API_SECRET
+   - FRONTEND_URL        = (Vercel URL — set after Vercel deploy)
+5. Railway will deploy automatically. Copy the generated URL (e.g. https://aarambh-api.up.railway.app)
+6. Run seed against production: DATABASE_URL=<prod_url> node backend/scripts/seed.js
+7. Run migration: DATABASE_URL=<prod_url> node -e "<migration script from Prompt 3>"
+
+For Vercel:
+1. In script.js and admin.js, change API_BASE to your Railway URL
+2. Commit and push
+3. vercel.com → Import Git Repository → set root to: frontend
+4. No build command — Vercel auto-detects static site
+5. Deploy → copy Vercel URL
+6. Go back to Railway → update FRONTEND_URL to your Vercel URL → Redeploy
+
+
+================================================================================
+TROUBLESHOOTING — READ THIS IF YOU HIT ANY ERROR
+================================================================================
+
+When you hit an error, copy the full error message and paste it to Claude
+with one of these phrases:
+
+─── DB CONNECTION ERROR ──────────────────────────────────────────────────────
+"I got this error starting the backend. Here is the full error: [PASTE ERROR].
+ The DATABASE_URL format I am using is: [PASTE URL, mask password].
+ Help me fix the db connection."
+
+─── MIGRATION SQL ERROR ──────────────────────────────────────────────────────
+"Running 001_init.sql gave this error: [PASTE ERROR].
+ I am using Neon.tech / Railway PostgreSQL / local PostgreSQL.
+ Here is the line that failed: [PASTE LINE].
+ Fix the migration SQL."
+
+─── JWT / AUTH ERROR ─────────────────────────────────────────────────────────
+"Login returns [PASTE RESPONSE]. The token is [present/missing].
+ Here is my authController.js: [PASTE FILE].
+ Here is my .env JWT_SECRET value (first 10 chars only): [PASTE].
+ Fix the auth."
+
+─── CLOUDINARY UPLOAD ERROR ──────────────────────────────────────────────────
+"Uploading an image to POST /api/gallery gives: [PASTE ERROR].
+ My upload.js is: [PASTE FILE].
+ My Cloudinary config: cloud_name=[value], api_key=[first 6 chars].
+ Fix the upload middleware."
+
+─── CORS ERROR ───────────────────────────────────────────────────────────────
+"Browser console shows: [PASTE CORS ERROR].
+ My frontend origin is: [URL].
+ My FRONTEND_URL env var is: [VALUE].
+ My app.js CORS config is: [PASTE].
+ Fix the CORS configuration."
+
+─── GENERAL RUNTIME ERROR ────────────────────────────────────────────────────
+"My Node server crashed with: [PASTE FULL STACK TRACE].
+ The request that caused it: [METHOD] [ENDPOINT] with body [PASTE BODY].
+ Here is the relevant controller: [PASTE FILE].
+ Find and fix the bug."
+
+─── FRONTEND FETCH ERROR ─────────────────────────────────────────────────────
+"The browser console shows fetch error: [PASTE ERROR].
+ My API_BASE is set to: [VALUE].
+ The network tab shows: status=[STATUS], response=[PASTE RESPONSE].
+ The API endpoint is: [ENDPOINT].
+ Fix the frontend fetch call."
+
+─── VERCEL / RAILWAY DEPLOY ERROR ───────────────────────────────────────────
+"Deploying to [Railway/Vercel] gives this build error: [PASTE ERROR].
+ My [backend/frontend] package.json is: [PASTE].
+ The root directory I set is: [VALUE].
+ Fix the deployment configuration."
+
+================================================================================
+END OF PROMPTS FILE
+Aarambh Dev Team · May 2026 · v1.0
+================================================================================
