@@ -40,7 +40,7 @@
     };
     window.addEventListener('scroll', handleScroll);
 
-    const API_BASE = 'http://localhost:5000'; // Hardcoded so it works even if user opens via file:///
+    const API_BASE = ''; // Use relative path so it works perfectly on both Render and Localhost
 
     // Dynamic Gallery Rendering (Synced with Admin Panel)
     const galleryGrid = document.querySelector('.gallery-grid');

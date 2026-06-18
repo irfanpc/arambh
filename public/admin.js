@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:5000'; // Hardcoded so it works even if user opens via file:///
+const API_BASE = ''; // Use relative path so it works perfectly on both Render and Localhost
 
 function authHeader() {
     return { 'Authorization': `Bearer ${sessionStorage.getItem('aarambh_token')}` };
