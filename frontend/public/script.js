@@ -15,6 +15,18 @@
                 }
             });
             hamburger.classList.toggle('toggle');
+            
+            // Toggle icon between bars and X
+            const icon = hamburger.querySelector('i');
+            if(icon) {
+                if (hamburger.classList.contains('toggle')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-xmark');
+                } else {
+                    icon.classList.remove('fa-xmark');
+                    icon.classList.add('fa-bars');
+                }
+            }
         });
 
         // Auto-close menu when a link is clicked
@@ -23,6 +35,14 @@
                 if (navLinks.classList.contains('active')) {
                     navLinks.classList.remove('active');
                     hamburger.classList.remove('toggle');
+                    
+                    // Reset icon
+                    const icon = hamburger.querySelector('i');
+                    if(icon) {
+                        icon.classList.remove('fa-xmark');
+                        icon.classList.add('fa-bars');
+                    }
+                    
                     links.forEach(l => {
                         l.style.animation = '';
                     });

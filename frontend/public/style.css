@@ -1380,15 +1380,26 @@ section {
 }
 
 .social-cards {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
-    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin: 40px auto 0;
+    max-width: 900px;
+}
+
+.column-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+    min-width: 250px;
+    max-width: 300px;
 }
 
 .social-card {
     background: var(--white);
-    padding: 40px 20px;
+    padding: 30px 15px;
     border-radius: var(--border-radius);
     text-align: center;
     text-decoration: none;
@@ -1398,8 +1409,11 @@ section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
     border-bottom: 5px solid transparent;
+    flex: 1;
+    min-width: 250px;
+    max-width: 300px;
 }
 
 .social-card:hover {
@@ -1412,13 +1426,13 @@ section {
 .social-card.youtube:hover { border-color: #FF0000; }
 
 .social-icon {
-    width: 70px;
-    height: 70px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: var(--white);
     transition: var(--transition);
 }
@@ -1428,20 +1442,21 @@ section {
 .social-card.youtube .social-icon { background: #FF0000; }
 
 .social-card h3 {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
 }
 
 .social-card p {
     color: var(--text-muted);
+    font-size: 0.9rem;
 }
 
 .btn-outline {
     display: inline-block;
-    margin-top: 10px;
-    padding: 8px 20px;
+    margin-top: 5px;
+    padding: 6px 15px;
     border-radius: 50px;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     border: 2px solid #e2e8f0;
     transition: var(--transition);
     color: var(--text-dark);
@@ -1450,6 +1465,8 @@ section {
 .social-card:hover .btn-outline {
     background: var(--bg-light);
 }
+
+
 
 /* =========================================
    CONTACT SECTION
@@ -1535,110 +1552,185 @@ section {
 }
 
 /* =========================================
-   FOOTER
+   PREMIUM FOOTER
    ========================================= */
-footer {
-    background-color: #333;
-    color: #fff;
-    padding-top: 70px;
+.premium-footer {
+    background-color: #0F172A; /* Deep Slate Blue */
+    color: #94A3B8; /* Soft Slate Text */
+    position: relative;
+    font-family: 'Poppins', sans-serif;
 }
 
-.footer-content {
+.footer-wave svg {
+    display: block;
+    width: 100%;
+    height: 60px;
+}
+
+.footer-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 50px;
-    margin-bottom: 50px;
+    grid-template-columns: 2fr 1fr 1.5fr 1.5fr;
+    gap: 40px;
+    padding: 60px 20px 40px;
 }
 
-.footer-brand .logo {
-    color: var(--primary-light);
+.footer-brand-col .footer-logo img {
+    height: 90px;
     margin-bottom: 20px;
-    display: inline-flex;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
 }
 
-.footer-brand .logo-img {
-    height: 80px;
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+.footer-tagline {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    color: #CBD5E1;
 }
 
-.footer-brand p {
-    color: #ccc;
-    margin-bottom: 20px;
-    padding-right: 20px;
-}
-
-.social-links {
+.footer-socials {
     display: flex;
     gap: 15px;
 }
 
-.social-links a {
+.footer-socials a {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 40px;
-    height: 40px;
-    background-color: rgba(255,255,255,0.1);
-    color: #fff;
+    width: 42px;
+    height: 42px;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #F8FAFC;
     border-radius: 50%;
-    transition: var(--transition);
+    font-size: 1.1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.social-links a:hover {
+.footer-socials a:hover {
     background-color: var(--primary-color);
-    transform: translateY(-3px);
+    border-color: var(--primary-color);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(225, 48, 108, 0.4);
 }
 
-.footer-links h4, .footer-working-hours h4 {
-    color: #fff;
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-    position: relative;
-    padding-bottom: 10px;
+.footer-links-col h4,
+.footer-contact-col h4,
+.footer-hours-col h4 {
+    color: #F8FAFC;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 15px;
 }
 
-.footer-links h4::after, .footer-working-hours h4::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
+.heading-underline {
     width: 40px;
     height: 3px;
     background-color: var(--primary-color);
     border-radius: 2px;
+    margin-bottom: 25px;
 }
 
-.footer-links ul, .footer-working-hours ul {
+.footer-links-col ul,
+.footer-contact-col ul {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-.footer-links ul li {
-    margin-bottom: 10px;
+.footer-links-col ul li {
+    margin-bottom: 12px;
 }
 
-.footer-links ul li a {
-    color: #ccc;
+.footer-links-col ul li a {
+    color: #94A3B8;
+    text-decoration: none;
     transition: all 0.3s ease;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.95rem;
 }
 
-.footer-links ul li a:hover {
-    color: var(--primary-light);
+.footer-links-col ul li a i {
+    font-size: 0.7rem;
+    margin-right: 8px;
+    color: var(--primary-color);
+    transition: transform 0.3s ease;
+}
+
+.footer-links-col ul li a:hover {
+    color: #F8FAFC;
     transform: translateX(5px);
 }
 
-.footer-working-hours ul li {
-    color: #ccc;
-    margin-bottom: 10px;
+.footer-links-col ul li a:hover i {
+    transform: translateX(3px);
 }
 
-.footer-bottom {
-    background-color: #222;
-    text-align: center;
+.contact-info-list li {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.contact-info-list li i {
+    color: var(--primary-color);
+    margin-top: 4px;
+    margin-right: 12px;
+    font-size: 1.1rem;
+}
+
+.hours-card {
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
     padding: 20px;
-    color: #999;
+}
+
+.hour-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+    font-size: 0.9rem;
+}
+
+.hour-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.hour-row.closed .time {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.footer-bottom-bar {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 25px 0;
+    background-color: #0B1120;
+}
+
+.bottom-bar-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+.footer-bottom-links a {
+    color: #94A3B8;
+    transition: color 0.3s ease;
+}
+
+.footer-bottom-links a:hover {
+    color: var(--primary-color);
+}
+
+.footer-bottom-links .separator {
+    margin: 0 10px;
+    opacity: 0.3;
 }
 
 /* =========================================
@@ -1699,7 +1791,7 @@ footer {
     }
     
     .hamburger.toggle i {
-        transform: rotate(90deg) scale(1.1);
+        transform: rotate(180deg) scale(1.1);
         color: var(--primary-color);
     }
     
@@ -1720,6 +1812,14 @@ footer {
         opacity: 0;
         border-bottom-left-radius: 20px;
         border-bottom-right-radius: 20px;
+    }
+    
+    .desktop-arrow {
+        display: none !important;
+    }
+    
+    .mobile-arrow {
+        display: inline-block !important;
     }
     
     .nav-links.active {
@@ -2012,3 +2112,138 @@ footer {
         font-size: 0.9rem;
     }
 }
+
+
+/* =========================================
+   STICKY LOGO OVERLAY
+========================================= */
+.content-wrapper {
+    position: relative;
+    width: 100%;
+}
+.sticky-track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100px;
+    z-index: 100;
+    pointer-events: none;
+    display: none;
+}
+@media (min-width: 1024px) {
+    .sticky-track {
+        display: block;
+    }
+}
+.sticky-logo {
+    position: sticky;
+    top: calc(100vh - 120px);
+    padding-left: 20px;
+    pointer-events: auto;
+}
+.sticky-logo img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background-color: #fff;
+    border: 2px solid var(--white);
+    opacity: 0.9;
+}
+.sticky-logo img:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+    opacity: 1;
+}
+@media (min-width: 1400px) {
+    .sticky-logo {
+        top: calc(100vh - 160px);
+    }
+    .sticky-logo img {
+        width: 120px;
+        height: 120px;
+    }
+}
+/* Mobile Floating Logo */
+@media (max-width: 1023px) {
+    .sticky-track {
+        display: block;
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        top: auto;
+        height: auto;
+        width: auto;
+        z-index: 1000;
+    }
+    .sticky-logo {
+        position: static;
+        transform: none;
+        padding-left: 0;
+    }
+    .sticky-logo img {
+        width: 60px;
+        height: 60px;
+        border: 2px solid var(--white);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        opacity: 1;
+    }
+}
+
+
+
+/* Fix footer underline alignment on mobile */
+@media (max-width: 768px) {
+    .footer-links h4::after, .footer-working-hours h4::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+
+
+/* =========================================
+   PREMIUM FOOTER RESPONSIVE
+========================================= */
+@media (max-width: 1024px) {
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .footer-brand-col, .footer-links-col, .footer-contact-col, .footer-hours-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .heading-underline {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .contact-info-list li {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .contact-info-list li i {
+        margin-right: 0;
+    }
+    
+    .bottom-bar-flex {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
