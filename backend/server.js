@@ -1,4 +1,5 @@
 require('dotenv').config();
+const https = require('https');
 const app  = require('./src/app');
 const pool = require('./src/config/db');
 
@@ -17,3 +18,13 @@ async function start() {
 start();
 
 // Force Render deployment trigger
+
+// Self-ping to prevent Render from sleeping (every 14 minutes)
+const RENDER_URL = "https://arambh-bpuc.onrender.com";
+setInterval(() => {
+  https.get(RENDER_URL, (res) => {
+    console.log(`[Self-Ping] Woke up Render. Status: ${res.statusCode}`);
+  }).on('error', (err) => {
+    console.error(`[Self-Ping Error]: ${err.message}`);
+  });
+}, 840000);
